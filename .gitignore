@@ -1,0 +1,7 @@
+plugins/
+db/
+public_html/
+
+docker-compose.override.yml
+.env
+WORDPRESS_CONFIG_EXTRA
