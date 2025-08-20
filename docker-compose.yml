@@ -1,6 +1,6 @@
 services:
   wordpress:
-    image: wordpress:6.7
+    image: wordpress:6.8
     restart: unless-stopped
     links:
       - mysql

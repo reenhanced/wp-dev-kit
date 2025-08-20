@@ -6,6 +6,10 @@
 define('WP_HOME', 'https://if-you-have-a-url-put-it-here');
 define('WP_SITEURL', 'https://if-you-have-a-url-put-it-here');
 
+// Turns on debugging features, but does not display errors on the frontend.
+define('WP_DEBUG_DISPLAY', false);
+define('WP_DEBUG_LOG', true);
+
 /* Multisite // Currently disabled
 define('WP_ALLOW_MULTISITE', true );
 // Manually setup via Tools -> Network Setup
