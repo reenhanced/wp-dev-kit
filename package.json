@@ -1,0 +1,16 @@
+{
+  "name": "wp-dev-kit",
+  "version": "0.2.0",
+  "private": true,
+  "devDependencies": {
+    "@wordpress/env": "^10.33.0"
+  },
+  "scripts": {
+    "start": "wp-env start",
+    "stop": "wp-env stop",
+    "destroy": "wp-env destroy --force",
+    "destroy:hard": "wp-env destroy --hard",
+    "cli": "wp-env run cli",
+    "install-plugins": "./install_plugins.sh"
+  }
+}

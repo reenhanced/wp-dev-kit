@@ -1,11 +1,19 @@
 #!/bin/bash
+set -euo pipefail
 
-docker compose down --remove-orphans
+if ! command -v npx >/dev/null 2>&1; then
+	echo "npx is required to reset the environment." >&2
+	exit 1
+fi
 
-sudo rm -rf public_html
-mkdir public_html
+echo "Destroying wp-env environment..."
+npx wp-env destroy --hard
+
+echo "Resetting local content directories..."
+rm -rf public_html/wp-content
+mkdir -p public_html/wp-content
 touch public_html/.keep
 
-sudo rm -rf db
-mkdir	db
+rm -rf db
+mkdir -p db
 touch db/.keep
