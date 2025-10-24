@@ -1,6 +1,28 @@
-# wp-dev-kit (wp-env edition)
+# wp-dev-kit
 
-This template now relies on [`@wordpress/env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (`wp-env`) instead of a bespoke Docker Compose stack. It keeps the repo free of secrets, makes it quick to spin up fresh WordPress installs, and still leaves room for local Docker overrides when you need custom labels or routing metadata.
+`wp-dev-kit` is a WordPress starter template powered by [`@wordpress/env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (`wp-env`). It keeps the repository free of secrets, makes new site builds trivial, and stays flexible for custom Docker overrides and future automation.
+
+## Using this template
+
+This repository is published as a GitHub template. To create a fresh project based on it:
+
+1. Click **Use this template** on the repository page and choose **Create a new repository**.
+2. Name your new repository, decide whether it should be public or private, and confirm the creation.
+3. Clone the newly created repository to your machine.
+4. Run `npm install` followed by `./setup.sh` to bootstrap WordPress with your preferred settings.
+
+Each derived repository remains independent, so any customisations or secrets stay within your project rather than the template.
+
+## Script overview
+
+| Script | When to use it | What it does |
+| --- | --- | --- |
+| `setup.sh` | First run after cloning your generated project | Prompts for site URL, ports, admin credentials, debugging, and multisite; writes `.wp-env.override.json`, `config/wp-config-extra.php`, a starter `.wp-env/docker-compose.override.yml`, and installs WordPress via `wp-env`. |
+| `build.sh` | Non-interactive restarts or CI-style spins | Starts `wp-env`, waits for WordPress to come online, and installs any plugin ZIPs found in `plugins/`. Uses the configuration already captured by `setup.sh`/wp-env defaults. |
+| `reset.sh` | Full local reset | Invokes `wp-env destroy --hard`, recreates `public_html/wp-content`, and leaves `.keep` placeholders so a fresh `setup.sh` run can rebuild the site. |
+| `install_plugins.sh` | Reinstall bundled plugin ZIPs | Uses `npx wp-env run cli` to install and activate ZIPs located in `plugins/`. |
+
+Run `setup.sh` once per clone to generate local overrides. After that, use `npm run start` (or `./build.sh`) whenever you need to bring the environment up quickly without prompts. Reach for `reset.sh` if you want to wipe data and start again, then rerun `setup.sh` to reapply your preferences.
 
 ## Prerequisites
 
@@ -14,12 +36,12 @@ npm install
 npm run start
 ```
 
-`npm run start` (or `./build.sh`) will:
-- launch the wp-env containers on port `8067`
-- wait for WordPress to finish installing
-- automatically install any plugin ZIPs dropped in `plugins/`
+`npm run start` (or `./build.sh`) does the following:
+- launches the wp-env containers on port `8067`
+- waits for WordPress to finish installing
+- automatically installs any plugin ZIPs located in `plugins/`
 
-When the command finishes you can log in at `http://localhost:8067/wp-admin/` using the default credentials `admin` / `password`. These defaults come from wp-env and are safe to keep in version control.
+When the command finishes, log in at `http://localhost:8067/wp-admin/` using the default credentials `admin` / `password`. wp-env manages these defaults so they remain safe to store in version control.
 
 ## Useful scripts
 
@@ -46,14 +68,14 @@ When the command finishes you can log in at `http://localhost:8067/wp-admin/` us
 └── README.md
 ```
 
-- `public_html/wp-content` is mapped into the container so you can develop custom code in-place.
-- `plugins/` is mounted at `/var/www/html/wp-content/wp-dev-kit-packages/` inside the container. Any ZIP you place here is available for `wp plugin install` commands.
-- Everything under `db/`, `plugins/`, and `public_html/` is gitignored except for `.keep` placeholders, keeping secrets and generated content out of the repository.
+- `public_html/wp-content` maps into the container so you can develop custom code in-place.
+- `plugins/` mounts to `/var/www/html/wp-content/wp-dev-kit-packages/` inside the container. Any ZIP placed here is available for `wp plugin install` commands.
+- Everything under `db/`, `plugins/`, and `public_html/` stays out of version control except for `.keep` placeholders, ensuring secrets and generated content remain local.
 
 ## Overriding wp-env settings
 
-- Copy `config/wp-config-extra.sample.php` to `config/wp-config-extra.php` and reference it from a `.wp-env.override.json` file if you need custom constants (`WP_HOME`, multisite flags, etc.).
-- To add Docker labels (or other compose tweaks), run `npm run start` once so `.wp-env/docker-compose.yml` is generated. Then create `.wp-env/docker-compose.override.yml` next to it with your additional settings. wp-env will respect the override file on subsequent starts.
+- Copy `config/wp-config-extra.sample.php` to `config/wp-config-extra.php` and reference it from `.wp-env.override.json` when custom constants (`WP_HOME`, multisite flags, and more) are required.
+- Add Docker labels or other compose tweaks by running `npm run start` once so `.wp-env/docker-compose.yml` exists, then create `.wp-env/docker-compose.override.yml` with your local additions. wp-env respects the override file on subsequent starts.
 
 Example override snippet for labels:
 
@@ -66,7 +88,7 @@ services:
       traefik.http.routers.wp-dev-kit.rule: Host(`example.local`)
 ```
 
-Because override files live inside `.wp-env/` (which is gitignored), you can safely store machine-specific labels or secrets there without affecting the template.
+Override files live inside `.wp-env/` (which is gitignored), so machine-specific labels or secrets stay out of the template.
 
 ## Running custom WP-CLI commands
 
@@ -76,7 +98,7 @@ Use `npm run cli -- <command>` or `npx wp-env run cli <command>`. For example:
 npm run cli -- wp option update blogname "Local Dev"
 ```
 
-This runs inside the WordPress container with access to the mapped content and plugin ZIPs.
+This command executes inside the WordPress container with access to the mapped content and plugin ZIPs.
 
 ## Resetting the environment
 
