@@ -11,6 +11,15 @@ This repository is published as a GitHub template. To create a fresh project bas
 3. Clone the newly created repository to your machine.
 4. Run `npm install` followed by `./setup.sh` to bootstrap WordPress with your preferred settings.
 
+Prefer the command line? The GitHub CLI can generate a repository directly:
+
+```bash
+gh repo create my-new-site --template reenhanced/wp-dev-kit
+cd my-new-site
+npm install
+./setup.sh
+```
+
 Each derived repository remains independent, so any customisations or secrets stay within your project rather than the template.
 
 ## Script overview
@@ -22,7 +31,7 @@ Each derived repository remains independent, so any customisations or secrets st
 | `reset.sh` | Full local reset | Invokes `wp-env destroy --hard`, recreates `public_html/wp-content`, and leaves `.keep` placeholders so a fresh `setup.sh` run can rebuild the site. |
 | `install_plugins.sh` | Reinstall bundled plugin ZIPs | Uses `npx wp-env run cli` to install and activate ZIPs located in `plugins/`. |
 
-Run `setup.sh` once per clone to generate local overrides. After that, use `npm run start` (or `./build.sh`) whenever you need a fast, non-interactive start that honours the saved defaults. Reach for `setup.sh` again if you want to change the configuration prompts, and use `reset.sh` if you need to wipe data before reapplying your preferences.
+Run `setup.sh` once per clone to generate local overrides. After that, use `npm run start` whenever you need to bring the environment up quickly without prompts. Reach for `reset.sh` if you want to wipe data and start again, then rerun `setup.sh` to reapply your preferences.
 
 ## Prerequisites
 
@@ -36,7 +45,7 @@ npm install
 npm run start
 ```
 
-`npm run start` (or `./build.sh` for a non-interactive shell equivalent) does the following:
+`npm run start` (or `./build.sh`) does the following:
 - launches the wp-env containers on port `8067`
 - waits for WordPress to finish installing
 - automatically installs any plugin ZIPs located in `plugins/`
