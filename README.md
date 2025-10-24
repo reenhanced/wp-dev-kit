@@ -22,7 +22,7 @@ Each derived repository remains independent, so any customisations or secrets st
 | `reset.sh` | Full local reset | Invokes `wp-env destroy --hard`, recreates `public_html/wp-content`, and leaves `.keep` placeholders so a fresh `setup.sh` run can rebuild the site. |
 | `install_plugins.sh` | Reinstall bundled plugin ZIPs | Uses `npx wp-env run cli` to install and activate ZIPs located in `plugins/`. |
 
-Run `setup.sh` once per clone to generate local overrides. After that, use `npm run start` (or `./build.sh`) whenever you need to bring the environment up quickly without prompts. Reach for `reset.sh` if you want to wipe data and start again, then rerun `setup.sh` to reapply your preferences.
+Run `setup.sh` once per clone to generate local overrides. After that, use `npm run start` (or `./build.sh`) whenever you need a fast, non-interactive start that honours the saved defaults. Reach for `setup.sh` again if you want to change the configuration prompts, and use `reset.sh` if you need to wipe data before reapplying your preferences.
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ npm install
 npm run start
 ```
 
-`npm run start` (or `./build.sh`) does the following:
+`npm run start` (or `./build.sh` for a non-interactive shell equivalent) does the following:
 - launches the wp-env containers on port `8067`
 - waits for WordPress to finish installing
 - automatically installs any plugin ZIPs located in `plugins/`
