@@ -1,36 +1,42 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Load the environment variables, used for build
-export $(grep -v '^#' .env | xargs)
+if ! command -v npx >/dev/null 2>&1; then
+  echo "npx is required to run this script." >&2
+  exit 1
+fi
 
-echo "Starting containers..."
-docker compose up -d
+echo "Starting wp-env environment..."
+npx wp-env start
 
-echo "Waiting for the database to be ready..."
-until docker compose exec mysql mysqladmin ping -h"localhost" --silent; do
-  echo "Database is not ready yet. Waiting..."
+echo "Waiting for WordPress to finish bootstrapping..."
+until npx wp-env run cli wp core is-installed >/dev/null 2>&1; do
+  echo "WordPress is not ready yet. Waiting..."
   sleep 5
 done
 
-echo "Waiting for WordPress to be ready..."
-until docker compose run --rm wpcli wp core is-installed > /dev/null 2>&1; do
-  echo "WordPress is not installed. Installing..."
-  docker compose run --rm wpcli wp core install \
-    --url="https://${WP_HOME}" \
-    --title="My WordPress Site" \
-    --admin_user="${WORDPRESS_ADMIN_USER}" \
-    --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
-    --admin_email="${WORDPRESS_ADMIN_EMAIL}"
-  sleep 5
-done
+if compgen -G "plugins/*.zip" >/dev/null 2>&1; then
+  echo "Installing plugin ZIP packages..."
+  ./install_plugins.sh
+fi
 
-echo "Installing plugins..."
-./install_plugins.sh
+site_url=""
+if site_url=$(npx wp-env run cli wp option get siteurl 2>/dev/null); then
+  site_url="${site_url//$'\r'/}"
+fi
 
-echo "Build process finished."
+admin_users=""
+if admin_users=$(npx wp-env run cli wp user list --role=administrator --field=user_login 2>/dev/null | tr -d '\r' | paste -sd ', ' -); then
+  admin_users=${admin_users%, }
+fi
+
+echo "Environment is ready."
 echo ""
-echo "🎉 WordPress is ready!"
-echo "🔗 Admin Panel: https://${WP_HOME}/wp-admin/"
-echo "👤 Username: ${WORDPRESS_ADMIN_USER}"
-echo "🔑 Password: ${WORDPRESS_ADMIN_PASSWORD}"
+echo "🎉 WordPress is running via wp-env"
+if [[ -n "$site_url" ]]; then
+  echo "🔗 Site URL: $site_url"
+fi
+if [[ -n "$admin_users" ]]; then
+  echo "👤 Admin users: $admin_users"
+fi
+echo "ℹ️  Update credentials or URL anytime by rerunning ./setup.sh or wp-env commands."
