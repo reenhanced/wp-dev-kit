@@ -20,9 +20,23 @@ if compgen -G "plugins/*.zip" >/dev/null 2>&1; then
   ./install_plugins.sh
 fi
 
+site_url=""
+if site_url=$(npx wp-env run cli wp option get siteurl 2>/dev/null); then
+  site_url="${site_url//$'\r'/}"
+fi
+
+admin_users=""
+if admin_users=$(npx wp-env run cli wp user list --role=administrator --field=user_login 2>/dev/null | tr -d '\r' | paste -sd ', ' -); then
+  admin_users=${admin_users%, }
+fi
+
 echo "Environment is ready."
 echo ""
 echo "🎉 WordPress is running via wp-env"
-echo "🔗 Admin Panel: http://localhost:8067/wp-admin/"
-echo "👤 Username: admin"
-echo "🔑 Password: password"
+if [[ -n "$site_url" ]]; then
+  echo "🔗 Site URL: $site_url"
+fi
+if [[ -n "$admin_users" ]]; then
+  echo "👤 Admin users: $admin_users"
+fi
+echo "ℹ️  Update credentials or URL anytime by rerunning ./setup.sh or wp-env commands."
