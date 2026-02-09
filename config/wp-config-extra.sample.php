@@ -21,7 +21,7 @@ if ( ! defined( 'WP_ALLOW_MULTISITE' ) ) {
 if ( ! defined( 'MULTISITE' ) ) {
     define( 'MULTISITE', true );
 }
-define( 'SUBDOMAIN_INSTALL', true );
+define( 'SUBDOMAIN_INSTALL', false );
 define( 'DOMAIN_CURRENT_SITE', 'example.test' );
 define( 'PATH_CURRENT_SITE', '/' );
 define( 'SITE_ID_CURRENT_SITE', 1 );

@@ -35,7 +35,7 @@ Run `setup.sh` once per clone to generate local overrides. After that, use `npm 
 
 ## Prerequisites
 
-- Node.js 18+ (for `npx` and local `@wordpress/env`)
+- Node.js 20+ (for `npx` and local `@wordpress/env`)
 - Docker Desktop / Docker Engine
 
 ## Getting started
@@ -46,7 +46,7 @@ npm run start
 ```
 
 `npm run start` (or `./build.sh`) does the following:
-- launches the wp-env containers on port `8067`
+- launches the wp-env containers (port `8067` by default; `setup.sh` auto-detects conflicts and proposes an open port)
 - waits for WordPress to finish installing
 - automatically installs any plugin ZIPs located in `plugins/`
 
@@ -72,6 +72,7 @@ When the command finishes, log in at `http://localhost:8067/wp-admin/` using the
 ├── build.sh                  # Wrapper around wp-env start + plugin bootstrap
 ├── config/
 │   └── wp-config-extra.sample.php  # Copy to wp-config-extra.php for custom constants
+├── LICENSE                   # MIT licence
 ├── plugins/                  # Drop plugin ZIP archives here; stays out of git
 ├── public_html/wp-content/   # Custom themes, mu-plugins, uploads, etc.
 └── README.md
@@ -99,6 +100,21 @@ services:
 
 Override files live inside `.wp-env/` (which is gitignored), so machine-specific labels or secrets stay out of the template.
 
+## Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| **Docker is not running** | Start Docker Desktop (or the Docker daemon) and try again. |
+| **Port already in use** | `setup.sh` auto-detects busy ports and suggests the next available one. You can also pass a custom port when prompted. |
+| **`npx` or `node` not found** | Install Node.js 20+ via [nvm](https://github.com/nvm-sh/nvm) or your system package manager. |
+| **Permission denied on scripts** | Run `chmod +x setup.sh build.sh reset.sh install_plugins.sh`. |
+| **WordPress keeps re-installing** | If `setup.sh` detects an existing install it will skip the install step. Run `./reset.sh` first for a truly fresh start. |
+| **Plugin ZIP not installing** | Ensure the file is in the `plugins/` directory with a `.zip` extension. |
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 ## Running custom WP-CLI commands
 
 Use `npm run cli -- <command>` or `npx wp-env run cli <command>`. For example:
@@ -114,9 +130,8 @@ This command executes inside the WordPress container with access to the mapped c
 If you need a clean slate:
 
 ```bash
-npm run destroy:hard
 ./reset.sh
 npm run start
 ```
 
-This sequence removes containers, clears generated content, and boots a fresh site.
+`reset.sh` runs `wp-env destroy --hard`, clears generated content directories, and recreates placeholder files so a fresh `./setup.sh` or `npm run start` can rebuild the site.

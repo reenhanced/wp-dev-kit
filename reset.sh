@@ -13,6 +13,7 @@ echo "Resetting local content directories..."
 rm -rf public_html/wp-content
 mkdir -p public_html/wp-content
 touch public_html/.keep
+touch public_html/wp-content/.keep
 
 rm -rf db
 mkdir -p db

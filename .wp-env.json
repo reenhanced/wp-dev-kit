@@ -1,8 +1,6 @@
 {
   "core": "WordPress/WordPress#6.8",
   "phpVersion": "8.2",
-  "port": 8067,
-  "testsPort": 9067,
   "mappings": {
     "wp-content": "./public_html/wp-content",
     "wp-content/wp-dev-kit-packages": "./plugins"

@@ -1,7 +1,16 @@
 {
   "name": "wp-dev-kit",
   "version": "0.2.0",
+  "description": "WordPress starter template powered by @wordpress/env",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reenhanced/wp-dev-kit.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@wordpress/env": "^10.33.0"
   },
