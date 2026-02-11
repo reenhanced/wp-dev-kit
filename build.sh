@@ -39,4 +39,4 @@ fi
 if [[ -n "$admin_users" ]]; then
   echo "👤 Admin users: $admin_users"
 fi
-echo "ℹ️  Update credentials or URL anytime by rerunning ./setup.sh or wp-env commands."
+echo "ℹ️  Update credentials or URL anytime by rerunning ./setup.sh or editing .wp-env.override.json."

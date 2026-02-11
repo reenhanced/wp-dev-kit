@@ -26,7 +26,7 @@ Each derived repository remains independent, so any customisations or secrets st
 
 | Script | When to use it | What it does |
 | --- | --- | --- |
-| `setup.sh` | First run after cloning your generated project | Prompts for site URL, ports, admin credentials, debugging, and multisite; writes `.wp-env.override.json`, `config/wp-config-extra.php`, a starter `.wp-env/docker-compose.override.yml`, and installs WordPress via `wp-env`. |
+| `setup.sh` | First run after cloning your generated project | Prompts for site URL, ports, admin credentials, debugging, and multisite; writes `.wp-env.override.json`, a starter `.wp-env/docker-compose.override.yml`, and installs WordPress via `wp-env`. |
 | `build.sh` | Non-interactive restarts or CI-style spins | Starts `wp-env`, waits for WordPress to come online, and installs any plugin ZIPs found in `plugins/`. Uses the configuration already captured by `setup.sh`/wp-env defaults. |
 | `reset.sh` | Full local reset | Invokes `wp-env destroy --hard`, recreates `public_html/wp-content`, and leaves `.keep` placeholders so a fresh `setup.sh` run can rebuild the site. |
 | `install_plugins.sh` | Reinstall bundled plugin ZIPs | Uses `npx wp-env run cli` to install and activate ZIPs located in `plugins/`. |
@@ -70,8 +70,6 @@ When the command finishes, log in at `http://localhost:8067/wp-admin/` using the
 .
 ├── .wp-env.json              # wp-env configuration (no secrets)
 ├── build.sh                  # Wrapper around wp-env start + plugin bootstrap
-├── config/
-│   └── wp-config-extra.sample.php  # Copy to wp-config-extra.php for custom constants
 ├── LICENSE                   # MIT licence
 ├── plugins/                  # Drop plugin ZIP archives here; stays out of git
 ├── public_html/wp-content/   # Custom themes, mu-plugins, uploads, etc.
@@ -84,7 +82,7 @@ When the command finishes, log in at `http://localhost:8067/wp-admin/` using the
 
 ## Overriding wp-env settings
 
-- Copy `config/wp-config-extra.sample.php` to `config/wp-config-extra.php` and reference it from `.wp-env.override.json` when custom constants (`WP_HOME`, multisite flags, and more) are required.
+- To change `WP_HOME`, `WP_SITEURL`, or any other WordPress constant, edit the `config` object in `.wp-env.override.json`. This is what wp-env actually reads. Alternatively, rerun `./setup.sh` to regenerate it interactively.
 - Add Docker labels or other compose tweaks by running `npm run start` once so `.wp-env/docker-compose.yml` exists, then create `.wp-env/docker-compose.override.yml` with your local additions. wp-env respects the override file on subsequent starts.
 
 Example override snippet for labels:

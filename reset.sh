@@ -7,7 +7,9 @@ if ! command -v npx >/dev/null 2>&1; then
 fi
 
 echo "Destroying wp-env environment..."
-npx wp-env destroy --hard
+if ! npx wp-env destroy --hard 2>/dev/null; then
+	echo "wp-env environment not found or already destroyed. Continuing cleanup..."
+fi
 
 echo "Resetting local content directories..."
 rm -rf public_html/wp-content
